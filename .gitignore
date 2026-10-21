@@ -3,5 +3,4 @@ node_modules/
 dist/
 .env
 *.log
-.claude/
 graphify-out/
