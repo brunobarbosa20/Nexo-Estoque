@@ -1,0 +1,104 @@
+{
+  "database/001_initial.sql": {
+    "mtime": 1792427411.9686918,
+    "seen": 1792613552.7347884,
+    "ast_hash": "a6baa826adb9652178a67d2cec146ee8",
+    "semantic_hash": "a6baa826adb9652178a67d2cec146ee8"
+  },
+  "database/002_app_user_grants.sql": {
+    "mtime": 1792427307.4493444,
+    "seen": 1792613552.7347963,
+    "ast_hash": "058de640ebf670c1bf7f4c616039a598",
+    "semantic_hash": "058de640ebf670c1bf7f4c616039a598"
+  },
+  "database/003_user_isolation.sql": {
+    "mtime": 1792427415.2174032,
+    "seen": 1792613552.7348,
+    "ast_hash": "c30983d20dfe4ea6397222b5cdbd288b",
+    "semantic_hash": "c30983d20dfe4ea6397222b5cdbd288b"
+  },
+  "database/supabase.sql": {
+    "mtime": 1792609309.5640464,
+    "seen": 1792613552.734803,
+    "ast_hash": "cecfcd092823f39b79b6f594b0970c92",
+    "semantic_hash": "cecfcd092823f39b79b6f594b0970c92"
+  },
+  "database/supabase_username_migration.sql": {
+    "mtime": 1792609222.5428543,
+    "seen": 1792613552.7348056,
+    "ast_hash": "4eba008f81301c99ff4fa2d59a15bac6",
+    "semantic_hash": "4eba008f81301c99ff4fa2d59a15bac6"
+  },
+  "package.json": {
+    "mtime": 1792599491.744825,
+    "seen": 1792613552.7348077,
+    "ast_hash": "a534dcc6494500b87a8a725ec444f614",
+    "semantic_hash": "a534dcc6494500b87a8a725ec444f614"
+  },
+  "src/App.tsx": {
+    "mtime": 1792611459.1815867,
+    "seen": 1792613552.7348104,
+    "ast_hash": "4aaf8f6b0fa5f6eeb49e383283b9240b",
+    "semantic_hash": "4aaf8f6b0fa5f6eeb49e383283b9240b"
+  },
+  "src/main.tsx": {
+    "mtime": 1792423394.7572007,
+    "seen": 1792613552.7348127,
+    "ast_hash": "a56d30717410097e45f94f2796f7c6b2",
+    "semantic_hash": "a56d30717410097e45f94f2796f7c6b2"
+  },
+  "src/supabase-api.ts": {
+    "mtime": 1792611435.293479,
+    "seen": 1792613552.7348146,
+    "ast_hash": "4ae43b42959f6c5827f43da78b5d9413",
+    "semantic_hash": "4ae43b42959f6c5827f43da78b5d9413"
+  },
+  "src/vite-env.d.ts": {
+    "mtime": 1792599473.5594766,
+    "seen": 1792613552.734817,
+    "ast_hash": "0352474ba2918efe13895edbc3780d94",
+    "semantic_hash": "0352474ba2918efe13895edbc3780d94"
+  },
+  "tsconfig.json": {
+    "mtime": 1792423387.816867,
+    "seen": 1792613552.7348194,
+    "ast_hash": "15727d98d72bf96d7e57ac26fd6deb3c",
+    "semantic_hash": "15727d98d72bf96d7e57ac26fd6deb3c"
+  },
+  "vite.config.ts": {
+    "mtime": 1792599472.5282357,
+    "seen": 1792613552.7348218,
+    "ast_hash": "2dc51eadd3ccf3ed74f72d3e85c05442",
+    "semantic_hash": "2dc51eadd3ccf3ed74f72d3e85c05442"
+  },
+  ".github/workflows/deploy.yml": {
+    "mtime": 1792599487.7185962,
+    "seen": 1792613552.734824,
+    "ast_hash": "59eae3fba12fc06635b1c17382bb4c9e",
+    "semantic_hash": "59eae3fba12fc06635b1c17382bb4c9e"
+  },
+  "CLAUDE.md": {
+    "mtime": 1792611644.2292404,
+    "seen": 1792613552.7348263,
+    "ast_hash": "67d88e9d0760c3ba54c75dfd9551c1c5",
+    "semantic_hash": "67d88e9d0760c3ba54c75dfd9551c1c5"
+  },
+  "README.md": {
+    "mtime": 1792609280.09289,
+    "seen": 1792613552.7348282,
+    "ast_hash": "8d9e634a3b813ecefc7452cad8444dd7",
+    "semantic_hash": "8d9e634a3b813ecefc7452cad8444dd7"
+  },
+  "index.html": {
+    "mtime": 1792428597.8838396,
+    "seen": 1792613552.7348301,
+    "ast_hash": "d7c1c560e6a973d51ef919bd5cec63e5",
+    "semantic_hash": "d7c1c560e6a973d51ef919bd5cec63e5"
+  },
+  "modelos/LEIA-ME.md": {
+    "mtime": 1792427765.7503722,
+    "seen": 1792613552.7348323,
+    "ast_hash": "7ecc09d099b707f149d4051e16310507",
+    "semantic_hash": "7ecc09d099b707f149d4051e16310507"
+  }
+}
