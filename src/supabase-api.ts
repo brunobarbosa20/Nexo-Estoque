@@ -77,8 +77,12 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   if (path === "/api/products" && method === "POST") {
     return data(supabase.rpc("create_product", { p_name: body.name, p_unit: body.unit, p_notes: body.notes ?? "", p_initial: body.initialQuantity ?? 0 })) as T;
   }
-  if (path === "/api/movements" && method === "GET") {
-    const rows = await data<any[]>(supabase.from("movements").select("*,products!inner(id,name,unit)").order("created_at", { ascending: false }).limit(50));
+  if ((path === "/api/movements" || path.startsWith("/api/movements?")) && method === "GET") {
+    const productId = new URLSearchParams(path.split("?", 2)[1] ?? "").get("productId");
+    let query = supabase.from("movements").select("*,products!inner(id,name,unit)").order("created_at", { ascending: false });
+    if (productId) query = query.eq("product_id", productId);
+    else query = query.limit(50);
+    const rows = await data<any[]>(query);
     const ids = [...new Set(rows.map(r => r.created_by))];
     const profiles = ids.length ? await data<any[]>(supabase.from("profiles").select("id,username").in("id", ids)) : [];
     const usernames = new Map(profiles.map(p => [p.id, p.username]));
