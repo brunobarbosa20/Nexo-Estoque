@@ -18,20 +18,47 @@ function authEmail(usernameInput: unknown) {
 async function sessionUser() {
   const { data: { session }, error } = await supabase.auth.getSession();
   fail(error);
+
   const user = session?.user;
   if (!user) return null;
-  const { data: member, error: memberError } = await supabase.from("inventory_members").select("role,inventory_id").eq("user_id", user.id).single();
+
+  const { data: member, error: memberError } = await supabase
+    .from("inventory_members")
+    .select("role,inventory_id")
+    .eq("user_id", user.id)
+    .single();
+
   fail(memberError);
-  const { data: profile, error: profileError } = await supabase.from("profiles").select("username").eq("id", user.id).single();
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .single();
+
   fail(profileError);
-  return { id: user.id, email: profile.username, role: member.role, inventoryId: member.inventory_id };
+
+  if (!member) {
+    throw new Error("Membro não encontrado.");
+  }
+
+  if (!profile) {
+    throw new Error("Perfil não encontrado.");
+  }
+
+  return {
+    id: user.id,
+    email: profile.username,
+    role: member.role,
+    inventoryId: member.inventory_id
+  };
 }
 
-async function data<T>(query: PromiseLike<{ data: T; error: { message: string } | null }>): Promise<T> {
-  const result = await query;
-  fail(result.error);
-  return result.data;
-}
+async function data<T>(query: any): Promise<T> {
+    const result = await query;
+    fail(result.error);
+    return result.data;
+  }
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   if (!url || !anonKey) throw new Error("Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env.");
