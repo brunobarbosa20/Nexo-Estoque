@@ -36,9 +36,9 @@
     "semantic_hash": "a534dcc6494500b87a8a725ec444f614"
   },
   "src/App.tsx": {
-    "mtime": 1793214069.2240472,
-    "seen": 1793214131.1705227,
-    "ast_hash": "d4f33b4ec12272264bd1c3d9a9ac819d",
+    "mtime": 1793220624.5571482,
+    "seen": 1793220678.554944,
+    "ast_hash": "6f74c6cc7a34d4aa1b979e0f6fe332b0",
     "semantic_hash": ""
   },
   "src/main.tsx": {
@@ -119,16 +119,22 @@
     "ast_hash": "8b0e90744651fa1bbce2374779498457",
     "semantic_hash": ""
   },
-  "_upd.txt": {
-    "mtime": 1793214130.5735452,
-    "seen": 1793214131.1723104,
-    "ast_hash": "0268f822b4d7c5efaa08a21c1ac194c2",
-    "semantic_hash": ""
-  },
   "estrutura.txt": {
     "mtime": 1792773453.0876613,
     "seen": 1793214131.1723154,
     "ast_hash": "e08806e22be41c5dfc4c08d7828a234a",
+    "semantic_hash": ""
+  },
+  "_dev.txt": {
+    "mtime": 1793220390.8287926,
+    "seen": 1793220678.5575156,
+    "ast_hash": "061e92b04a8b5694c2274f134b2a6d06",
+    "semantic_hash": ""
+  },
+  "_dev_err.txt": {
+    "mtime": 1793220390.8297899,
+    "seen": 1793220678.5575185,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
     "semantic_hash": ""
   }
 }

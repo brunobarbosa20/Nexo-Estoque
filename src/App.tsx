@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { api } from "./supabase-api";
 import "./app.css";
@@ -68,7 +68,9 @@ export default function App() {
   const [notice, setNotice] = useState("");
   const [dialog, setDialog] = useState<"product" | "edit-product" | "movement" | "recipe" | "product-details" | null>(null);
   const [actionDialog, setActionDialog] = useState<"edit-product" | "movement" | null>(null);
-  const [stockStatusFilter, setStockStatusFilter] = useState<"all" | "active" | "no-stock" | "inactive" | "cancelled" | "pending">("all");
+  const [visibleStatuses, setVisibleStatuses] = useState<Set<"active" | "no-stock" | "inactive" | "cancelled" | "pending">>(() => new Set(["active", "no-stock", "inactive", "cancelled", "pending"]));
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false);
+  const statusFilterRef = useRef<HTMLDivElement | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productHistory, setProductHistory] = useState<Movement[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -93,22 +95,39 @@ export default function App() {
   const canOperate = user?.role === "admin" || user?.role === "operator";
   const activeProducts = useMemo(() => products.filter(p => p.active !== false && !p.cancelled), [products]);
   const productsWithStock = activeProducts.filter(p => Number(p.quantity) > 0).length;
+  const productStatusKey = (p: Product): "active" | "no-stock" | "inactive" | "cancelled" | "pending" => {
+    if (p.cancelled) return "cancelled";
+    if (p.pendingRegistration) return "pending";
+    if (p.active === false) return "inactive";
+    return Number(p.quantity) > 0 ? "active" : "no-stock";
+  };
   const filteredStockProducts = useMemo(() => {
-    if (stockStatusFilter === "all") return products;
-    return products.filter(p => {
-      const cancelled = !!p.cancelled;
-      const inactive = p.active === false && !cancelled;
-      const pending = !!p.pendingRegistration;
-      const hasStock = Number(p.quantity) > 0;
-      if (stockStatusFilter === "cancelled") return cancelled;
-      if (stockStatusFilter === "pending") return pending;
-      if (stockStatusFilter === "inactive") return inactive;
-      if (cancelled || inactive || pending) return false;
-      if (stockStatusFilter === "no-stock") return !hasStock;
-      if (stockStatusFilter === "active") return hasStock;
-      return true;
+    return products.filter(p => visibleStatuses.has(productStatusKey(p)));
+  }, [products, visibleStatuses]);
+  const toggleStatus = (key: "active" | "no-stock" | "inactive" | "cancelled" | "pending") => {
+    setVisibleStatuses(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
     });
-  }, [products, stockStatusFilter]);
+  };
+  useEffect(() => {
+    if (!statusFilterOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (statusFilterRef.current && !statusFilterRef.current.contains(e.target as Node)) {
+        setStatusFilterOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setStatusFilterOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [statusFilterOpen]);
   async function act(task: () => Promise<unknown>, success: string) {
     setError(""); setNotice("");
     try { await task(); setNotice(success); setDialog(null); setSelectedProduct(null); await load(); }
@@ -132,7 +151,7 @@ export default function App() {
       {error && <div className="banner error" role="alert"><span>{error}</span><button aria-label="Fechar aviso" onClick={() => setError("")}>×</button></div>}{notice && <div className="banner success" role="status"><span>{notice}</span><button aria-label="Fechar aviso" onClick={() => setNotice("")}>×</button></div>}
       {loadingData && <p className="loading-inline" aria-live="polite">Atualizando dados…</p>}
       {section === "overview" && <><div className="welcome"><div><p className="eyebrow">PAINEL DE CONTROLE</p><h2>Olá, {user.email.split("@")[0]}</h2><p className="muted">Acompanhe o resumo do seu estoque.</p></div><button className="secondary" onClick={() => void load()}>↻ Atualizar</button></div><div className="stat-grid"><article className="stat-card"><span className="stat-icon blue">▣</span><p>Produtos ativos</p><strong>{activeProducts.length}</strong><small>itens cadastrados</small></article><article className="stat-card"><span className="stat-icon green">✓</span><p>Produtos com saldo</p><strong>{productsWithStock}</strong><small>produtos ativos com quantidade positiva</small></article><article className="stat-card"><span className="stat-icon amber">♨</span><p>Receitas</p><strong>{recipes.length}</strong><small>receitas cadastradas</small></article><article className="stat-card"><span className="stat-icon violet">!</span><p>Estoque zerado</p><strong>{activeProducts.filter(p => Number(p.quantity) <= 0).length}</strong><small>produtos ativos sem saldo</small></article></div><section className="panel"><div className="panel-heading"><div><h2>Produtos com menor saldo</h2><p className="muted">Itens ativos ordenados pela quantidade disponível.</p></div><button className="text-button" onClick={() => setSection("stock")}>Ver estoque →</button></div><ProductTable products={[...activeProducts].sort((a, b) => Number(a.quantity) - Number(b.quantity)).slice(0, 5)} onHistory={openHistory} /></section><section className="panel"><div className="panel-heading"><div><h2>Movimentações recentes</h2><p className="muted">Entradas e saídas recentes do seu estoque.</p></div></div>{movements.length ? <div className="table-wrap"><table><thead><tr><th>Data</th><th>Tipo</th><th>Produto</th><th>Quantidade</th><th>Autoria</th><th>Observação</th></tr></thead><tbody>{movements.map(m => <tr key={m.id}><td>{(m.createdAt ?? m.created_at) ? new Date(m.createdAt ?? m.created_at!).toLocaleString("pt-BR") : "—"}</td><td><span className={`pill ${m.type === "entrada" ? "active" : "warning"}`}>{m.type}</span></td><td>{m.product?.name ?? m.productName ?? m.product_name ?? "Produto"}</td><td>{Number(m.quantity).toLocaleString("pt-BR", { maximumFractionDigits: 0 })} {m.unit ?? m.product?.unit ?? ""}</td><td>{m.createdByEmail ?? m.created_by_email ?? "—"}</td><td>{m.note || "—"}</td></tr>)}</tbody></table></div> : <p className="empty-state">Nenhuma movimentação encontrada.</p>}</section></>}
-      {section === "stock" && <section className="panel"><div className="panel-heading"><div><p className="eyebrow">MEU ESTOQUE</p><h2>Produtos</h2><p className="muted">Produtos, saldos e movimentações do seu estoque.</p></div><div className="stock-toolbar">{canOperate && <button className="primary" onClick={() => setDialog("product")}>＋ Novo produto</button>}<label className="sr-only" htmlFor="stock-status-filter">Filtrar por status</label><select id="stock-status-filter" value={stockStatusFilter} onChange={e => setStockStatusFilter(e.target.value as "all" | "active" | "no-stock" | "inactive" | "cancelled" | "pending")}><option value="all">Todos os status</option><option value="active">Ativo</option><option value="no-stock">Sem saldo</option><option value="inactive">Inativo</option><option value="cancelled">Cancelado</option><option value="pending">Pendente de cadastro</option></select></div></div><ProductTable products={filteredStockProducts} onHistory={openHistory} /></section>}
+      {section === "stock" && <section className="panel"><div className="panel-heading"><div><p className="eyebrow">MEU ESTOQUE</p><h2>Produtos</h2><p className="muted">Produtos, saldos e movimentações do seu estoque.</p></div><div className="stock-toolbar"><div className="status-filter" ref={statusFilterRef}><button type="button" className="status-filter-button" onClick={() => setStatusFilterOpen(o => !o)} aria-expanded={statusFilterOpen} aria-haspopup="true">⚙ Status {visibleStatuses.size === 5 ? "(todos)" : `(${visibleStatuses.size})`}</button>{statusFilterOpen && <div className="status-filter-dropdown" role="menu"><p className="status-filter-dropdown-title">Exibir status:</p><div className="status-filter-list">{[{ key: "active" as const, label: "Ativo" }, { key: "no-stock" as const, label: "Sem saldo" }, { key: "inactive" as const, label: "Inativo" }, { key: "cancelled" as const, label: "Cancelado" }, { key: "pending" as const, label: "Pendente de cadastro" }].map(o => <label key={o.key} className="status-filter-item"><input type="checkbox" checked={visibleStatuses.has(o.key)} onChange={() => toggleStatus(o.key)} /><span>{o.label}</span></label>)}</div><div className="status-filter-actions"><button type="button" className="text-button" onClick={() => setVisibleStatuses(new Set(["active", "no-stock", "inactive", "cancelled", "pending"]))}>Marcar todos</button><button type="button" className="text-button" onClick={() => setVisibleStatuses(new Set())}>Desmarcar todos</button></div></div>}</div>{canOperate && <button className="primary" onClick={() => setDialog("product")}>＋ Novo produto</button>}</div></div><ProductTable products={filteredStockProducts} onHistory={openHistory} /></section>}
       {section === "recipes" && <section className="panel"><div className="panel-heading"><div><p className="eyebrow">PRODUÇÃO</p><h2>Receitas</h2><p className="muted">Receitas e ingredientes cadastrados.</p></div><button className="primary" onClick={() => setDialog("recipe")}>＋ Nova receita</button></div>{recipes.length ? <div className="recipe-grid">{recipes.map(r => <article className="recipe-card" key={r.id}><div className="recipe-heading"><span className="stat-icon amber">♨</span><span><h3>{r.name}</h3><small>{r.portions ? `${r.portions} porções` : "Porções não informadas"}</small></span></div>{r.ingredients?.length ? <ul>{r.ingredients.map((i, n) => <li key={i.id ?? n}>{i.name} <span>{i.quantity} {i.unit}</span></li>)}</ul> : <p className="muted">Ingredientes não informados pela API.</p>}{r.createdBy === user.id && <div className="inline-actions"><button className="secondary compact" onClick={() => void act(() => api(`/api/recipes/${encodeURIComponent(r.id)}`, { method: "DELETE" }), "Receita removida.")}>Excluir</button></div>}</article>)}</div> : <p className="empty-state">Nenhuma receita cadastrada.</p>}</section>}
     </main>{dialog && <Modal title={dialog === "product" ? "Novo produto" : dialog === "edit-product" ? `Editar ${selectedProduct?.name ?? "produto"}` : dialog === "movement" ? `Movimentar ${selectedProduct?.name ?? "produto"}` : dialog === "product-details" ? selectedProduct?.name ?? "Produto" : "Nova receita"} onClose={() => setDialog(null)}>{dialog === "product-details" && selectedProduct ? <ProductDetails product={selectedProduct} movements={productHistory} loading={historyLoading} error={historyError} canOperate={!!canOperate} onAction={setActionDialog} onStateAction={(task, success) => void act(task, success)} /> : <DialogForm kind={dialog === "product-details" ? "product" : dialog} product={selectedProduct} products={activeProducts} onSubmit={task => void act(task, dialog === "product" ? "Produto cadastrado." : dialog === "edit-product" ? "Produto atualizado." : dialog === "movement" ? "Movimentação registrada." : "Receita salva.")} />}</Modal>}{actionDialog && selectedProduct && <Modal title={actionDialog === "movement" ? `Movimentar ${selectedProduct.name}` : `Editar ${selectedProduct.name}`} onClose={() => setActionDialog(null)}><DialogForm key={`${selectedProduct.id}-${actionDialog}`} kind={actionDialog} product={selectedProduct} products={activeProducts} onSubmit={task => void act(task, actionDialog === "movement" ? "Movimentação registrada." : "Produto atualizado.")} /></Modal>}</div>;
 }

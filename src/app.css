@@ -139,7 +139,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .panel-heading h2 { margin: 0 0 4px; color: var(--text); font-size: 16px; font-weight: 650; letter-spacing: -.015em; }
 .panel-heading .muted { margin: 0; }
 .stock-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.stock-toolbar select { min-height: 36px; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; }
+.status-filter { position: relative; display: inline-block; margin-bottom: 0; }
+.status-filter-button { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; }
+.status-filter-button:hover { background: var(--surface-2, var(--surface)); border-color: var(--primary, #2563eb); }
+.status-filter-button[aria-expanded="true"] { border-color: var(--primary, #2563eb); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary, #2563eb) 15%, transparent); }
+.status-filter-dropdown { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; min-width: 240px; padding: 12px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--surface); box-shadow: 0 12px 32px rgba(0, 0, 0, .18); }
+.status-filter-dropdown-title { margin: 0 0 8px; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
+.status-filter-list { display: flex; flex-direction: column; gap: 6px; }
+.status-filter-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; padding: 4px 2px; border-radius: 6px; }
+.status-filter-item:hover { background: var(--surface-2, var(--surface)); }
+.status-filter-item input { width: 16px; height: 16px; accent-color: var(--primary, #2563eb); }
+.status-filter-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
 
 .table-wrap { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
