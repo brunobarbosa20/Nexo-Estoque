@@ -138,6 +138,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 17px; }
 .panel-heading h2 { margin: 0 0 4px; color: var(--text); font-size: 16px; font-weight: 650; letter-spacing: -.015em; }
 .panel-heading .muted { margin: 0; }
+.stock-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.stock-toolbar select { min-height: 36px; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; }
 
 .table-wrap { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
